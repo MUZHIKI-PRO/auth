@@ -22,7 +22,7 @@ class CompaniesSeeder extends Seeder
 
     private function getCompanies()
     {
-        return Http::get('https://id.muzhiki.pro/api/companies');
+        return Http::get('https://id.muzhiki.pro/api/companies')->object();
     }
 
 }

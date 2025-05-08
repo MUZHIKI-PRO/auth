@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class Access extends Model
 {
-    protected $table = 'mpa_access';
+    protected $table = 'mpa_accesses';
 }
