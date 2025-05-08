@@ -12,12 +12,12 @@ trait Accessible
 {
     public function accesses()
     {
-        return $this->hasMany(Access::class, 'mpa_access_user');
+        return $this->belongsToMany(Access::class, 'mpa_access_user');
     }
 
     public function companies()
     {
-        return $this->hasMany(Company::class, 'mpa_company');
+        return $this->belongsToMany(Company::class, 'mpa_access_user');
     }
 
     public static function getUserFromToken(string $token)
