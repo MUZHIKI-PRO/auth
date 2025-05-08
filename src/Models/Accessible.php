@@ -47,14 +47,14 @@ trait Accessible
         }
         if(!$user){
             $user = new config('muzhiki-auth.user_model');
-            $user->name = $obj->name;
-            $user->email = $obj->email ?? null;
-            $user->password = md5(Str::password());
-            $user->phone = $obj->phone ?? null;
-            $user->yclients_user_id = $obj->yclients_user_id ?? null;
-            $user->yclients_id = $obj->yclients_id ?? null;
-            $user->save();
         }
+        $user->name = $obj->name;
+        $user->email = $obj->email ?? null;
+        $user->password = md5(Str::password());
+        $user->phone = $obj->phone ?? null;
+        $user->yclients_user_id = $obj->yclients_user_id ?? null;
+        $user->yclients_id = $obj->yclients_id ?? null;
+        $user->save();
 
 
         $user->setAccesses($obj->accesses);
