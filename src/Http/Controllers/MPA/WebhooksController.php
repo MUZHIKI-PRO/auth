@@ -14,7 +14,7 @@ class WebhooksController
 
     public function changeRights(Request $request)
     {
-        if($request->input('event') == 'rightsUpdated') return;
+        if($request->input('event') != 'rightsUpdated') return;
         $hash = hash('sha256', $request->input('user_id').'.'.json_encode($request->input('data')).'.'.config('muzhiki-auth.signature'));
         if($request->input('hash') != $hash) abort(401);
 
