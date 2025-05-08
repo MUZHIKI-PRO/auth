@@ -14,6 +14,8 @@ class AuthServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        $this->loadRoutesFrom(__DIR__.'/routes/api.php');
+
         $this->publishes([
             __DIR__.'/config/muzhiki-auth.php' => config_path('muzhiki-auth.php'),
         ], 'config');
@@ -21,6 +23,11 @@ class AuthServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/database/migrations/' => database_path('migrations'),
         ], 'migrations');
+
+        $this->publishes([
+            __DIR__.'/database/seeders/' => database_path('seeders/vendor/MuzhikiProAuth'),
+        ], 'seeders');
+
 
         // Пример гейта
         Gate::define('view-dashboard', function ($user) {
