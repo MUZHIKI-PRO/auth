@@ -39,6 +39,12 @@ trait Accessible
         if (!$user) {
             $user = config('muzhiki-auth.user_model')::where('yclients_id', $obj->yclients_id)->first();
         }
+        if (!$user) {
+            $user = config('muzhiki-auth.user_model')::where('email', $obj->email)->first();
+        }
+        if (!$user) {
+            $user = config('muzhiki-auth.user_model')::where('phone', $obj->phone)->first();
+        }
         if($user) return $user;
         $user = new config('muzhiki-auth.user_model');
         $user->name = $obj->name;
