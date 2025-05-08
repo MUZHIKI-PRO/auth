@@ -73,9 +73,9 @@ trait Accessible
 
         $this->accesses()->detach();
         foreach ($data as $company){
-            foreach ($company['rights'] as $right){
-                $this->accesses()->attach($map[$right], ['company_id' => $company['company_id']]);
-            }
+            $company = (object) $company;
+            $company->pivot = (object) $company->pivot;
+            $this->accesses()->attach($map[$company->key], ['company_id' => $company->pivot->company_id]);
         }
     }
 }
