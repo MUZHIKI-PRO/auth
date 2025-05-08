@@ -24,7 +24,7 @@ trait Accessible
     {
         $response = Http::withToken(config('muzhiki-auth.client_secret'))
             ->withHeader('App-Id', config('muzhiki-auth.client_id'))
-            ->get(config('muzhiki-auth.auth_service_endpoint').'/api/getUser',
+            ->post(config('muzhiki-auth.auth_service_endpoint').'/api/getUser',
                 [
                     'token' => $token
                 ]
