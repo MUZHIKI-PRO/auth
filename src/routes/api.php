@@ -8,5 +8,5 @@ Route::middleware(['api'])
     ->prefix('mpa')
     ->group(function () {
         Route::get('manifest', [ManifestController::class, 'getManifest']);
-        Route::get('changeRights', [WebhooksController::class, 'changeRights']);
+        Route::post('changeRights', [WebhooksController::class, 'changeRights']);
     });
