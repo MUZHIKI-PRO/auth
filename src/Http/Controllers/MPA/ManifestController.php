@@ -8,6 +8,10 @@ class ManifestController
 {
     public function getManifest(): string
     {
-        return Access::all()->except(['id']);
+        $data = Access::all()->map(function ($item) {
+            return collect($item)->except(['id']);
+        });
+
+        return response()->json($data);
     }
 }
