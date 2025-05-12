@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use MuzhikiPro\Auth\Models\MPA\Access;
@@ -56,25 +57,40 @@ trait Accessible
      */
     protected static function getUser($obj)
     {
-        $email = trim(mb_strtolower($obj->email));
+
         $userModel = config('muzhiki-auth.user_model');
+        $query     = $userModel::query();
 
-// Находим пользователя по любому из четырёх полей
-        $user = $userModel::where(function($query) use ($obj, $email) {
-            $query->where('yclients_user_id', $obj->yclients_user_id)
-                ->orWhere('yclients_id',        $obj->yclients_id)
-                ->orWhereRaw('LOWER(TRIM(email)) = ?', [$email])
-                ->orWhere('phone',              $obj->phone);
-        })->first();
+// Добавляем условия только если в $obj есть данные
+        if (!empty($obj->yclients_user_id)) {
+            $query->orWhere('yclients_user_id', $obj->yclients_user_id);
+        }
 
-// Если не нашли — создаём «чистого» пользователя
-        if (!$user) {
+        if (!empty($obj->yclients_id)) {
+            $query->orWhere('yclients_id', $obj->yclients_id);
+        }
+
+        if (!empty($obj->email)) {
+            // нормализуем e-mail: убираем пробелы и приводим к нижнему регистру
+            $normalizedEmail = mb_strtolower(trim($obj->email));
+            $query->orWhereRaw('LOWER(email) = ?', [$normalizedEmail]);
+        }
+
+        if (!empty($obj->phone)) {
+            $query->orWhere('phone', $obj->phone);
+        }
+
+// выполняем поиск
+        $user = $query->first();
+
+// если не нашли — создаём, иначе берём старого
+        if (! $user) {
             $user = new $userModel;
+            $user->password = Hash::make(Str::random(16));
         }
 
         $user->name = $obj->name;
         $user->email = $obj->email ?? null;
-        $user->password = md5(Str::password());
         $user->phone = $obj->phone ?? null;
         $user->yclients_user_id = $obj->yclients_user_id ?? null;
         $user->yclients_id = $obj->yclients_id ?? null;
