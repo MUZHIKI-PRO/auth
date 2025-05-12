@@ -2,6 +2,7 @@
 
 namespace MuzhikiPro\Auth\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Auth;
@@ -123,6 +124,34 @@ trait Accessible
     public function hasAccessForCompany(string $access, int $company_id) : bool
     {
         return $this->accesses()->where('key', $access)->wherePivot('company_id', $company_id)->exitst();
+    }
+
+    /**
+     * Возвращает коллекцию пользователей с определённой ролью для определённой компании
+     * @param Builder $query
+     * @param string $access
+     * @param int $company_id
+     * @return Builder
+     */
+    public function scopeWhereHasAccessForCompany(Builder $query, string $access, int $companyId): Builder
+    {
+        return $query->whereHas('accesses', function (Builder $q) use ($access, $companyId) {
+            $q->where('key', $access)
+                ->wherePivot('company_id', $companyId);
+        });
+    }
+
+    /**
+     * Возвращает коллекцию пользователей с определённой ролью
+     * @param Builder $query
+     * @param string $access
+     * @return Builder
+     */
+    public function scopeWhereHasAccess(Builder $query, string $access): Builder
+    {
+        return $query->whereHas('accesses', function (Builder $q) use ($access) {
+            $q->where('key', $access);
+        });
     }
 
 }
