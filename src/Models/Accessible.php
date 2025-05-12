@@ -56,19 +56,22 @@ trait Accessible
      */
     protected static function getUser($obj)
     {
-        $user = config('muzhiki-auth.user_model')::where('yclients_user_id', $obj->yclients_user_id)->first();
+        $email = trim(mb_strtolower($obj->email));
+        $userModel = config('muzhiki-auth.user_model');
+
+// Находим пользователя по любому из четырёх полей
+        $user = $userModel::where(function($query) use ($obj, $email) {
+            $query->where('yclients_user_id', $obj->yclients_user_id)
+                ->orWhere('yclients_id',        $obj->yclients_id)
+                ->orWhereRaw('LOWER(TRIM(email)) = ?', [$email])
+                ->orWhere('phone',              $obj->phone);
+        })->first();
+
+// Если не нашли — создаём «чистого» пользователя
         if (!$user) {
-            $user = config('muzhiki-auth.user_model')::where('yclients_id', $obj->yclients_id)->first();
+            $user = new $userModel;
         }
-        if (!$user) {
-            $user = config('muzhiki-auth.user_model')::where('email', $obj->email)->first();
-        }
-        if (!$user) {
-            $user = config('muzhiki-auth.user_model')::where('phone', $obj->phone)->first();
-        }
-        if(!$user){
-            $user = new config('muzhiki-auth.user_model');
-        }
+
         $user->name = $obj->name;
         $user->email = $obj->email ?? null;
         $user->password = md5(Str::password());
