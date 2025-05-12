@@ -51,6 +51,23 @@ trait Accessible
     }
 
     /**
+     * @throws RequestException
+     * @throws ConnectionException
+     */
+    public function setTgId(string $telegram_id): void
+    {
+        $response = Http::withToken(config('muzhiki-auth.client_secret'))
+            ->withHeader('App-Id', config('muzhiki-auth.client_id'))
+            ->post(config('muzhiki-auth.auth_service_endpoint').'/api/set-telegram',
+                [
+                    'yclients_user_id' => $this->yclients_user_id,
+                    'telegram_id' => $telegram_id
+                ]
+            );
+        $response->throw();
+    }
+
+    /**
      * Обновляет и возвращает пользователя по объекту от МУЖИКИ ПРО ID
      * @param $obj
      * @return config
