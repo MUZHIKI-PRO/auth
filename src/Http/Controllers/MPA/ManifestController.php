@@ -12,6 +12,6 @@ class ManifestController
             return collect($item)->except(['id']);
         });
 
-        return response()->json($data);
+        return $data;
     }
 }
