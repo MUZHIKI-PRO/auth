@@ -2,6 +2,8 @@
 
 namespace MuzhikiPro\Auth\Models;
 
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -10,16 +12,29 @@ use MuzhikiPro\Auth\Models\MPA\Company;
 
 trait Accessible
 {
+    /**
+     * @return mixed Возвращает коллекцию доступов пользователя
+     */
     public function accesses()
     {
         return $this->belongsToMany(Access::class, 'mpa_access_user');
     }
 
+    /**
+     * @return mixed Возвращает коллекцию компаний, к которым у пользователя есть доступ
+     */
     public function companies()
     {
         return $this->belongsToMany(Company::class, 'mpa_access_user');
     }
 
+    /**
+     * Получает информацию о пользователе по access-токену (полученному после редиректа с МУЖИКИ ПРО ID)
+     * @param string $token
+     * @return config
+     * @throws ConnectionException
+     * @throws RequestException
+     */
     public static function getUserFromToken(string $token)
     {
         $response = Http::withToken(config('muzhiki-auth.client_secret'))
@@ -33,6 +48,11 @@ trait Accessible
         return self::getUser($response->object());
     }
 
+    /**
+     * Обновляет и возвращает пользователя по объекту от МУЖИКИ ПРО ID
+     * @param $obj
+     * @return config
+     */
     protected static function getUser($obj)
     {
         $user = config('muzhiki-auth.user_model')::where('yclients_user_id', $obj->yclients_user_id)->first();
@@ -63,6 +83,11 @@ trait Accessible
         return $user;
     }
 
+    /**
+     * Устанавливает доступы для пользователя
+     * @param $data
+     * @return void
+     */
     public function setAccesses($data)
     {
         $accesses_map = Access::select(['id', 'key'])->get();
@@ -78,4 +103,26 @@ trait Accessible
             $this->accesses()->attach($map[$company->key], ['company_id' => $company->pivot->company_id]);
         }
     }
+
+    /**
+     * Возвращает результат проверки наличия определённого тега у пользователя
+     * @param string $access
+     * @return bool
+     */
+    public function hasAccess(string $access) : bool
+    {
+        return $this->accesses()->where('key', $access)->exists();
+    }
+
+    /**
+     * Возвращает результат проверки наличия определённого тега у пользователя для конкретной компании
+     * @param string $access
+     * @param int $company_id
+     * @return bool
+     */
+    public function hasAccessForCompany(string $access, int $company_id) : bool
+    {
+        return $this->accesses()->where('key', $access)->wherePivot('company_id', $company_id)->exitst();
+    }
+
 }
