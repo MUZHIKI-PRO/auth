@@ -20,10 +20,10 @@ class WebhooksController
 
         $userModel = config('muzhiki-auth.user_model');
         $query     = $userModel::query();
-        $obj = collect($request->all());
+        $obj = (object) $request->toArray();
 
         // Добавляем условия только если в $obj есть данные
-        if (!empty($obj->muzhikipro_user_id)) {
+        if (!empty($obj->user_id)) {
             $query->where('muzhikipro_user_id', $obj->user_id);
         }
 

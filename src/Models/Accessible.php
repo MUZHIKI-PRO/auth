@@ -79,7 +79,7 @@ trait Accessible
         $query     = $userModel::query();
 
         // Добавляем условия только если в $obj есть данные
-        if (!empty($obj->muzhikipro_user_id)) {
+        if (!empty($obj->user_id)) {
             $query->where('muzhikipro_user_id', $obj->user_id);
         }
 
