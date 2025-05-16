@@ -20,8 +20,13 @@ class WebhooksController
 
         $userModel = config('muzhiki-auth.user_model');
         $query     = $userModel::query();
+        $obj = collect($request->all());
 
-// Добавляем условия только если в $obj есть данные
+        // Добавляем условия только если в $obj есть данные
+        if (!empty($obj->muzhikipro_user_id) > 0) {
+            $query->orWhereIn('muzhikipro_user_id', $obj->user_id);
+        }
+
         if (!empty($obj->yclients_user_ids) && count($obj->yclients_user_ids) > 0) {
             $query->orWhereIn('yclients_user_id', $obj->yclients_user_ids);
         }
