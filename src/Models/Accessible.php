@@ -181,7 +181,7 @@ trait Accessible
     {
         return $query->whereHas('accesses', function (Builder $q) use ($access, $companyId) {
             $q->where('key', $access)
-                ->wherePivot('company_id', $companyId);
+                ->where('mpa_access_user.company_id', $companyId);
         });
     }
 
