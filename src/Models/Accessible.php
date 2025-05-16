@@ -79,8 +79,8 @@ trait Accessible
         $query     = $userModel::query();
 
         // Добавляем условия только если в $obj есть данные
-        if (!empty($obj->muzhikipro_user_id) > 0) {
-            $query->orWhereIn('muzhikipro_user_id', $obj->user_id);
+        if (!empty($obj->muzhikipro_user_id)) {
+            $query->where('muzhikipro_user_id', $obj->user_id);
         }
 
         if (!empty($obj->yclients_user_ids) && count($obj->yclients_user_ids) > 0) {
@@ -181,7 +181,7 @@ trait Accessible
     {
         return $query->whereHas('accesses', function (Builder $q) use ($access, $companyId) {
             $q->where('key', $access)
-                ->where('mpa_access_user.company_id', $companyId);
+                ->wherePivot('company_id', $companyId);
         });
     }
 

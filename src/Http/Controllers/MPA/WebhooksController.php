@@ -23,8 +23,8 @@ class WebhooksController
         $obj = collect($request->all());
 
         // Добавляем условия только если в $obj есть данные
-        if (!empty($obj->muzhikipro_user_id) > 0) {
-            $query->orWhereIn('muzhikipro_user_id', $obj->user_id);
+        if (!empty($obj->muzhikipro_user_id)) {
+            $query->where('muzhikipro_user_id', $obj->user_id);
         }
 
         if (!empty($obj->yclients_user_ids) && count($obj->yclients_user_ids) > 0) {
@@ -46,6 +46,9 @@ class WebhooksController
         $user = $query->first();
 
         if (!$user) return;
+
+        $user->muzhikipro_user_id = $obj->user_id;
+        $user->save();
 
         $user->setAccesses($request->input('data'));
     }
