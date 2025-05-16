@@ -60,7 +60,7 @@ trait Accessible
             ->withHeader('App-Id', config('muzhiki-auth.client_id'))
             ->post(config('muzhiki-auth.auth_service_endpoint').'/api/set-telegram',
                 [
-                    'yclients_user_id' => $this->yclients_user_id,
+                    'muzhikipro_user_id' => $this->muzhikipro_user_id,
                     'telegram_id' => $telegram_id
                 ]
             );
@@ -79,22 +79,20 @@ trait Accessible
         $query     = $userModel::query();
 
 // Добавляем условия только если в $obj есть данные
-        if (!empty($obj->yclients_user_id)) {
-            $query->orWhere('yclients_user_id', $obj->yclients_user_id);
+        if (!empty($obj->yclients_user_ids) && count($obj->yclients_user_ids) > 0) {
+            $query->orWhereIn('yclients_user_id', $obj->yclients_user_ids);
         }
 
-        if (!empty($obj->yclients_id)) {
-            $query->orWhere('yclients_id', $obj->yclients_id);
+        if (!empty($obj->yclients_ids) && count($obj->yclients_ids) > 0) {
+            $query->orWhereIn('yclients_id', $obj->yclients_ids);
         }
 
-        if (!empty($obj->email)) {
-            // нормализуем e-mail: убираем пробелы и приводим к нижнему регистру
-            $normalizedEmail = mb_strtolower(trim($obj->email));
-            $query->orWhereRaw('LOWER(email) = ?', [$normalizedEmail]);
+        if (!empty($obj->emails) && count($obj->emails) > 0) {
+            $query->orWhereIn('email', $obj->emails);
         }
 
-        if (!empty($obj->phone)) {
-            $query->orWhere('phone', $obj->phone);
+        if (!empty($obj->phones) && count($obj->phones) > 0) {
+            $query->orWhereIn('phone', $obj->phones);
         }
 
 // выполняем поиск
@@ -107,10 +105,11 @@ trait Accessible
         }
 
         $user->name = $obj->name;
-        $user->email = $obj->email ?? null;
-        $user->phone = $obj->phone ?? null;
-        $user->yclients_user_id = $obj->yclients_user_id ?? null;
-        $user->yclients_id = $obj->yclients_id ?? null;
+        $user->email = count($obj->emails) > 0 && $obj->emails[0] ? $obj->emails[0] : null;
+        $user->phone = count($obj->phones) > 0 && $obj->phones[0] ? $obj->phones[0] : null;
+        $user->yclients_user_id = null;
+        $user->yclients_id = null;
+        $user->muzhikipro_user_id = $obj->user_id;
         $user->save();
 
 
@@ -173,7 +172,7 @@ trait Accessible
     {
         return $query->whereHas('accesses', function (Builder $q) use ($access, $companyId) {
             $q->where('key', $access)
-                ->wherePivot('company_id', $companyId);
+                ->where('mpa_access_user.company_id', $companyId);
         });
     }
 
