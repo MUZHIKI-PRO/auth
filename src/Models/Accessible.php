@@ -19,7 +19,7 @@ trait Accessible
      */
     public function accesses()
     {
-        return $this->belongsToMany(Access::class, 'mpa_access_user');
+        return $this->belongsToMany(Access::class, 'mpa_access_user')->withPivot('company_id');
     }
 
     /**
@@ -152,6 +152,11 @@ trait Accessible
     public function hasAccess(string $access) : bool
     {
         return $this->accesses()->where('key', $access)->exists();
+    }
+
+    public function getCompanyWithAccess(string $access)
+    {
+        return $this->accesses()->where('key', $access)->get()->pluck('pivot.company_id');
     }
 
     /**
