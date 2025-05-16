@@ -28,7 +28,7 @@ class WebhooksController
         }
 
         if (!empty($obj->telegram_id)) {
-            $query->orWhereIn('telegram_id', $obj->telegram_id);
+            $query->orWhere('telegram_id', $obj->telegram_id);
         }
 
         if (!empty($obj->yclients_user_ids) && count($obj->yclients_user_ids) > 0) {
