@@ -67,15 +67,6 @@ trait Accessible
         $response->throw();
     }
 
-    public function getStaffIdForCompany(string $company): string
-    {
-        $response = Http::withToken(config('muzhiki-auth.client_secret'))
-            ->withHeader('App-Id', config('muzhiki-auth.client_id'))
-            ->get(config('muzhiki-auth.auth_service_endpoint').'/api/user/'.$this->id.'/company/'.$company.'staffId',);
-        $response->throw();
-        return $response->body();
-    }
-
     /**
      * Обновляет и возвращает пользователя по объекту от МУЖИКИ ПРО ID
      * @param $obj
