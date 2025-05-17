@@ -46,8 +46,8 @@ trait Accessible
                     'token' => $token
                 ]
             );
+        if ($response->notFound()) return false;
         $response->throw();
-        if (!$response->body()) return false;
         return self::getUser($response->object());
     }
 
