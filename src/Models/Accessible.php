@@ -33,7 +33,7 @@ trait Accessible
     /**
      * Получает информацию о пользователе по access-токену (полученному после редиректа с МУЖИКИ ПРО ID)
      * @param string $token
-     * @return config
+     * @return false|config
      * @throws ConnectionException
      * @throws RequestException
      */
@@ -47,6 +47,7 @@ trait Accessible
                 ]
             );
         $response->throw();
+        if (!$response->body()) return false;
         return self::getUser($response->object());
     }
 
