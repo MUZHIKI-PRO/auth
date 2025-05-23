@@ -3,6 +3,7 @@
 namespace MuzhikiPro\Auth\Http\Controllers\MPA;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use MuzhikiPro\Auth\Models\MPA\Access;
 
 class WebhooksController
@@ -15,6 +16,8 @@ class WebhooksController
     public function changeRights(Request $request)
     {
         if($request->input('event') != 'rightsUpdated') return;
+        Log::debug('Секрет: '.config('muzhiki-auth.signature'));
+        Log::debug('Подпись: '.hash('sha256', $request->input('user_id').'.'.json_encode($request->input('data')).'.'.config('muzhiki-auth.signature')));
         $hash = hash('sha256', $request->input('user_id').'.'.json_encode($request->input('data')).'.'.config('muzhiki-auth.signature'));
         if($request->input('hash') != $hash) abort(401);
 

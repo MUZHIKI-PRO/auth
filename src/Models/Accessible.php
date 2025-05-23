@@ -43,7 +43,7 @@ trait Accessible
             ->withHeader('App-Id', config('muzhiki-auth.client_id'))
             ->post(config('muzhiki-auth.auth_service_endpoint').'/api/getUser',
                 [
-                    'token' => $token
+                    'code' => $token
                 ]
             );
         if ($response->notFound()) return false;
